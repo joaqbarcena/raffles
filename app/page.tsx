@@ -30,14 +30,22 @@ export default function Dashboard() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex items-center justify-between gap-2">
         <h1 className="text-2xl font-bold">Mis Rifas</h1>
-        <button
-          onClick={() => setShowForm(true)}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
-        >
-          Nueva Rifa
-        </button>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/chat"
+            className="rounded-lg bg-gray-100 px-4 py-2 text-sm text-gray-600 hover:bg-gray-200"
+          >
+            Chat
+          </Link>
+          <button
+            onClick={() => setShowForm(true)}
+            className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700"
+          >
+            Nueva Rifa
+          </button>
+        </div>
       </div>
 
       {error && (
