@@ -12,10 +12,7 @@ import {
 export async function listRaffles(): Promise<Raffle[]> {
   const ids = await getAllRaffleIds();
   const raffles = await Promise.all(
-    ids.map(async (id) => {
-      const raw = await getRaffle(id);
-      return raw ? (JSON.parse(raw) as Raffle) : null;
-    })
+    ids.map(async (id) => getRaffle<Raffle>(id))
   );
   return raffles.filter((r): r is Raffle => r !== null);
 }
@@ -30,14 +27,13 @@ export async function createRaffle(input: CreateRaffleInput): Promise<Raffle> {
     createdAt: new Date().toISOString(),
     participants: [],
   };
-  await setRaffle(raffle.id, JSON.stringify(raffle));
+  await setRaffle(raffle.id, raffle);
   await saveRaffleId(raffle.id);
   return raffle;
 }
 
 export async function getRaffleById(id: string): Promise<Raffle | null> {
-  const raw = await getRaffle(id);
-  return raw ? (JSON.parse(raw) as Raffle) : null;
+  return getRaffle<Raffle>(id);
 }
 
 export async function updateRaffle(
@@ -53,7 +49,7 @@ export async function updateRaffle(
     ...(input.totalNumbers !== undefined && { totalNumbers: input.totalNumbers }),
     ...(input.numbersPerRow !== undefined && { numbersPerRow: input.numbersPerRow }),
   };
-  await setRaffle(id, JSON.stringify(updated));
+  await setRaffle(id, updated);
   return updated;
 }
 
@@ -94,7 +90,7 @@ export async function addParticipant(
   };
 
   raffle.participants.push(participant);
-  await setRaffle(raffleId, JSON.stringify(raffle));
+  await setRaffle(raffleId, raffle);
   return { raffle };
 }
 
@@ -106,6 +102,6 @@ export async function removeParticipant(
   if (!raffle) return null;
 
   raffle.participants = raffle.participants.filter((p) => p.id !== participantId);
-  await setRaffle(raffleId, JSON.stringify(raffle));
+  await setRaffle(raffleId, raffle);
   return raffle;
 }

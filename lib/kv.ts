@@ -3,11 +3,11 @@ import { Redis } from "@upstash/redis";
 const KV_PREFIX = "raffle:";
 
 function getRedis(): Redis {
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  const url = process.env.KV_REST_API_URL;
+  const token = process.env.KV_REST_API_TOKEN;
   if (!url || !token) {
     throw new Error(
-      "Missing Upstash Redis credentials. Set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in .env.local"
+      "Missing Upstash Redis credentials. Set KV_REST_API_URL and KV_REST_API_TOKEN in .env.local"
     );
   }
   return new Redis({ url, token });
@@ -32,12 +32,12 @@ export async function deleteRaffleId(id: string): Promise<void> {
   await redis.srem(`${KV_PREFIX}ids`, id);
 }
 
-export async function getRaffle(id: string): Promise<string | null> {
+export async function getRaffle<R>(id: string): Promise<R | null> {
   const redis = getRedis();
-  return redis.get(kvKey(id));
+  return redis.get<R>(kvKey(id));
 }
 
-export async function setRaffle(id: string, data: string): Promise<void> {
+export async function setRaffle(id: string, data: unknown): Promise<void> {
   const redis = getRedis();
   await redis.set(kvKey(id), data);
 }

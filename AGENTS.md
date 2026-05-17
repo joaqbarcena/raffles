@@ -80,6 +80,7 @@ Participant { id, name, numbers[], createdAt }
 ## Gotchas
 
 - `@vercel/kv` is deprecated — use `@upstash/redis` instead.
+- Vercel KV integration exposes `KV_REST_API_URL` / `KV_REST_API_TOKEN` env vars (not `UPSTASH_REDIS_*`). The app reads `KV_*` vars.
 - `html-to-image` runs client-side only; the export button won't work without a browser.
 - No authentication — single-user app.
 - No tests configured yet.
