@@ -13,6 +13,10 @@ export interface Raffle {
   numbersPerRow: number;
   createdAt: string;
   participants: Participant[];
+  prices: string[];
+  paymentAlias: string;
+  disclaimer: string;
+  soldEmoji: string;
 }
 
 export interface CreateRaffleInput {
@@ -20,6 +24,10 @@ export interface CreateRaffleInput {
   prizes: string[];
   totalNumbers: number;
   numbersPerRow: number;
+  prices: string[];
+  paymentAlias: string;
+  disclaimer: string;
+  soldEmoji?: string;
 }
 
 export interface AddParticipantInput {

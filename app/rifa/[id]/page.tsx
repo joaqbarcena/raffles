@@ -54,7 +54,7 @@ export default function RaffleDetail() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-4xl px-4 py-8">
+      <div className="mx-auto max-w-6xl px-4 py-8">
         <p className="text-sm text-gray-400">Cargando...</p>
       </div>
     );
@@ -62,7 +62,7 @@ export default function RaffleDetail() {
 
   if (error && !raffle) {
     return (
-      <div className="mx-auto max-w-4xl px-4 py-8">
+      <div className="mx-auto max-w-6xl px-4 py-8">
         <p className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-600">
           {error}
         </p>
@@ -79,52 +79,95 @@ export default function RaffleDetail() {
   const prizes = raffle.prizes || [(raffle as any).prize].filter(Boolean);
 
   return (
-    <div className="mx-auto max-w-5xl px-3 py-6 sm:px-4 sm:py-8">
-      <div className="mb-4 flex items-center justify-between">
-        <div className="min-w-0 flex-1">
-          <Link
-            href="/"
-            className="text-sm text-blue-600 hover:underline"
-          >
-            &larr; Volver
-          </Link>
-          <h1 className="mt-1 truncate text-xl font-bold sm:text-2xl">{raffle.title}</h1>
-          <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-sm text-gray-500">
-            {prizes.map((p: string, i: number) => (
-              <span key={i}>
-                <span className="font-medium">{i + 1}°</span> {p}
-              </span>
-            ))}
-          </div>
-        </div>
-        <button
-          onClick={handleDelete}
-          className="shrink-0 rounded-lg bg-red-100 px-3 py-1.5 text-xs text-red-600 hover:bg-red-200"
-        >
-          Eliminar
-        </button>
-      </div>
-
-      {error && (
-        <p className="mb-4 rounded-md bg-red-50 p-3 text-sm text-red-600">
-          {error}
-        </p>
-      )}
-
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+    <div className="mx-auto max-w-6xl px-3 py-6 sm:px-4 sm:py-8">
+      <div className="flex flex-col gap-6 lg:flex-row">
         <div className="min-w-0 flex-1 overflow-x-auto">
-          <ImageExport title={raffle.title}>
-            <NumberGrid
-              totalNumbers={raffle.totalNumbers}
-              numbersPerRow={raffle.numbersPerRow}
-              participants={raffle.participants}
-              title={raffle.title}
-              prizes={prizes}
-            />
-          </ImageExport>
+          <NumberGrid
+            totalNumbers={raffle.totalNumbers}
+            numbersPerRow={raffle.numbersPerRow}
+            participants={raffle.participants}
+            soldEmoji={raffle.soldEmoji}
+          />
         </div>
 
-        <div className="w-full shrink-0 space-y-4 lg:w-72">
+        <div className="w-full shrink-0 space-y-4 lg:w-80">
+          <div className="flex items-start justify-between">
+            <div>
+              <Link href="/" className="text-sm text-blue-600 hover:underline">
+                &larr; Volver
+              </Link>
+              <h1 className="mt-1 text-xl font-bold sm:text-2xl">{raffle.title}</h1>
+            </div>
+            <button
+              onClick={handleDelete}
+              className="shrink-0 rounded-lg bg-red-100 px-3 py-1.5 text-xs text-red-600 hover:bg-red-200"
+            >
+              Eliminar
+            </button>
+          </div>
+
+          {error && (
+            <p className="rounded-md bg-red-50 p-3 text-sm text-red-600">
+              {error}
+            </p>
+          )}
+
+          <div className="rounded-xl bg-white p-4 shadow">
+            <h2 className="mb-2 text-sm font-semibold text-gray-500 uppercase tracking-wide">
+              Premios
+            </h2>
+            <div className="space-y-2">
+              {prizes.map((p: string, i: number) => (
+                <div key={i} className="flex items-center gap-2 text-sm">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-100 text-xs font-bold text-amber-700">
+                    {i + 1}
+                  </span>
+                  <span>{p}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-xl bg-white p-4 shadow">
+            <h2 className="mb-2 text-sm font-semibold text-gray-500 uppercase tracking-wide">
+              Emoji de vendido
+            </h2>
+            <div className="flex flex-wrap gap-1.5">
+              {["🎫", "❌", "🔴", "🟢", "🎟️", "🚫", "🧑‍🤝‍🧑", "🙋", "💸", "🏆"].map((emoji) => (
+                <button
+                  key={emoji}
+                  onClick={async () => {
+                    setRaffle({ ...raffle, soldEmoji: emoji });
+                    await fetch(`/api/raffles/${id}`, {
+                      method: "PUT",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ soldEmoji: emoji }),
+                    });
+                  }}
+                  className={`flex h-9 w-9 items-center justify-center rounded-lg text-lg transition-colors ${
+                    raffle.soldEmoji === emoji
+                      ? "bg-blue-100 ring-2 ring-blue-500"
+                      : "bg-gray-50 hover:bg-gray-100 ring-1 ring-gray-200"
+                  }`}
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <ImageExport
+            title={raffle.title}
+            prizes={prizes}
+            totalNumbers={raffle.totalNumbers}
+            numbersPerRow={raffle.numbersPerRow}
+            participants={raffle.participants}
+            prices={raffle.prices || []}
+            paymentAlias={raffle.paymentAlias || ""}
+            disclaimer={raffle.disclaimer || ""}
+            soldEmoji={raffle.soldEmoji}
+          />
+
           <ParticipantForm
             raffleId={id}
             totalNumbers={raffle.totalNumbers}

@@ -18,6 +18,7 @@ export async function listRaffles(): Promise<Raffle[]> {
       if (!r.prizes && (r as any).prize) {
         r.prizes = [(r as any).prize];
       }
+      if (!r.soldEmoji) r.soldEmoji = "🎫";
       return r;
     })
   );
@@ -33,6 +34,10 @@ export async function createRaffle(input: CreateRaffleInput): Promise<Raffle> {
     numbersPerRow: input.numbersPerRow,
     createdAt: new Date().toISOString(),
     participants: [],
+    prices: input.prices.filter(Boolean),
+    paymentAlias: input.paymentAlias,
+    disclaimer: input.disclaimer,
+    soldEmoji: input.soldEmoji || "🎫",
   };
   await setRaffle(raffle.id, raffle);
   await saveRaffleId(raffle.id);
@@ -44,6 +49,7 @@ export async function getRaffleById(id: string): Promise<Raffle | null> {
   if (r && !r.prizes && (r as any).prize) {
     r.prizes = [(r as any).prize];
   }
+  if (r && !r.soldEmoji) r.soldEmoji = "🎫";
   return r;
 }
 
@@ -59,6 +65,10 @@ export async function updateRaffle(
     ...(input.prizes !== undefined && { prizes: input.prizes }),
     ...(input.totalNumbers !== undefined && { totalNumbers: input.totalNumbers }),
     ...(input.numbersPerRow !== undefined && { numbersPerRow: input.numbersPerRow }),
+    ...(input.prices !== undefined && { prices: input.prices }),
+    ...(input.paymentAlias !== undefined && { paymentAlias: input.paymentAlias }),
+    ...(input.disclaimer !== undefined && { disclaimer: input.disclaimer }),
+    ...(input.soldEmoji !== undefined && { soldEmoji: input.soldEmoji }),
   };
   await setRaffle(id, updated);
   return updated;
