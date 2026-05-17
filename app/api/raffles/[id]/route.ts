@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { getRaffleById, updateRaffle, deleteRaffle } from "@/lib/store";
-import type { CreateRaffleInput } from "@/lib/types";
 
 export async function GET(
   _request: Request,
@@ -30,7 +29,7 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const body: Partial<CreateRaffleInput> = await request.json();
+    const body = await request.json();
     const raffle = await updateRaffle(id, body);
     if (!raffle) {
       return NextResponse.json(

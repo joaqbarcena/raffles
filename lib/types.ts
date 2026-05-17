@@ -8,7 +8,7 @@ export interface Participant {
 export interface Raffle {
   id: string;
   title: string;
-  prize: string;
+  prizes: string[];
   totalNumbers: number;
   numbersPerRow: number;
   createdAt: string;
@@ -17,7 +17,7 @@ export interface Raffle {
 
 export interface CreateRaffleInput {
   title: string;
-  prize: string;
+  prizes: string[];
   totalNumbers: number;
   numbersPerRow: number;
 }

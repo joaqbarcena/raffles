@@ -65,6 +65,7 @@ export default function Dashboard() {
               (acc, p) => acc + p.numbers.length,
               0
             );
+            const prizes = r.prizes || [(r as any).prize].filter(Boolean);
             return (
               <Link
                 key={r.id}
@@ -72,7 +73,10 @@ export default function Dashboard() {
                 className="block rounded-xl bg-white p-4 shadow transition hover:shadow-md"
               >
                 <h2 className="font-semibold">{r.title}</h2>
-                <p className="text-sm text-gray-500">Premio: {r.prize}</p>
+                <p className="text-sm text-gray-500">
+                  Premios: {prizes.slice(0, 3).join(" — ")}
+                  {prizes.length > 3 && " — + más"}
+                </p>
                 <div className="mt-1 text-xs text-gray-400">
                   {soldCount}/{r.totalNumbers} números vendidos —{" "}
                   {r.participants.length} participantes

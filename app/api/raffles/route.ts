@@ -24,9 +24,9 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-    if (!body.prize?.trim()) {
+    if (!body.prizes || body.prizes.length === 0 || !body.prizes.some((p: string) => p.trim())) {
       return NextResponse.json(
-        { error: "El premio es obligatorio" },
+        { error: "Debe haber al menos un premio" },
         { status: 400 }
       );
     }

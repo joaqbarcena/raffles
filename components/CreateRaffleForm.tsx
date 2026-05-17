@@ -10,11 +10,26 @@ interface Props {
 
 export default function CreateRaffleForm({ onCreated, onCancel }: Props) {
   const [title, setTitle] = useState("");
-  const [prize, setPrize] = useState("");
+  const [prizes, setPrizes] = useState([""]);
   const [totalNumbers, setTotalNumbers] = useState(100);
   const [numbersPerRow, setNumbersPerRow] = useState(10);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+
+  function updatePrize(index: number, value: string) {
+    const next = [...prizes];
+    next[index] = value;
+    setPrizes(next);
+  }
+
+  function addPrize() {
+    setPrizes([...prizes, ""]);
+  }
+
+  function removePrize(index: number) {
+    if (prizes.length <= 1) return;
+    setPrizes(prizes.filter((_, i) => i !== index));
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -24,8 +39,9 @@ export default function CreateRaffleForm({ onCreated, onCancel }: Props) {
       setError("El título es obligatorio");
       return;
     }
-    if (!prize.trim()) {
-      setError("El premio es obligatorio");
+    const filledPrizes = prizes.map((p) => p.trim()).filter(Boolean);
+    if (filledPrizes.length === 0) {
+      setError("Debe haber al menos un premio");
       return;
     }
 
@@ -33,7 +49,7 @@ export default function CreateRaffleForm({ onCreated, onCancel }: Props) {
     try {
       const body: CreateRaffleInput = {
         title: title.trim(),
-        prize: prize.trim(),
+        prizes: filledPrizes,
         totalNumbers,
         numbersPerRow,
       };
@@ -55,7 +71,7 @@ export default function CreateRaffleForm({ onCreated, onCancel }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-md rounded-xl bg-white p-6 shadow-lg"
@@ -79,13 +95,38 @@ export default function CreateRaffleForm({ onCreated, onCancel }: Props) {
         </div>
 
         <div className="mb-3">
-          <label className="mb-1 block text-sm font-medium">Premio</label>
-          <input
-            className="w-full rounded-lg border px-3 py-2 text-sm"
-            value={prize}
-            onChange={(e) => setPrize(e.target.value)}
-            placeholder="TV LED 50 pulgadas"
-          />
+          <label className="mb-1 block text-sm font-medium">Premios</label>
+          <div className="space-y-2">
+            {prizes.map((p, i) => (
+              <div key={i} className="flex gap-2">
+                <span className="flex items-center text-xs text-gray-400 w-6 shrink-0">
+                  #{i + 1}
+                </span>
+                <input
+                  className="flex-1 rounded-lg border px-3 py-2 text-sm"
+                  value={p}
+                  onChange={(e) => updatePrize(i, e.target.value)}
+                  placeholder={i === 0 ? "TV LED 50\"" : i === 1 ? "Parlante Bluetooth" : i === 2 ? "Peluche" : `Premio #${i + 1}`}
+                />
+                {prizes.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removePrize(i)}
+                    className="text-red-400 hover:text-red-600 text-sm px-1"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={addPrize}
+            className="mt-1.5 text-xs text-blue-600 hover:underline"
+          >
+            + Agregar otro premio
+          </button>
         </div>
 
         <div className="mb-3 grid grid-cols-2 gap-3">

@@ -12,7 +12,14 @@ import {
 export async function listRaffles(): Promise<Raffle[]> {
   const ids = await getAllRaffleIds();
   const raffles = await Promise.all(
-    ids.map(async (id) => getRaffle<Raffle>(id))
+    ids.map(async (id) => {
+      const r = await getRaffle<Raffle>(id);
+      if (!r) return null;
+      if (!r.prizes && (r as any).prize) {
+        r.prizes = [(r as any).prize];
+      }
+      return r;
+    })
   );
   return raffles.filter((r): r is Raffle => r !== null);
 }
@@ -21,7 +28,7 @@ export async function createRaffle(input: CreateRaffleInput): Promise<Raffle> {
   const raffle: Raffle = {
     id: uuidv4(),
     title: input.title,
-    prize: input.prize,
+    prizes: input.prizes,
     totalNumbers: input.totalNumbers,
     numbersPerRow: input.numbersPerRow,
     createdAt: new Date().toISOString(),
@@ -33,7 +40,11 @@ export async function createRaffle(input: CreateRaffleInput): Promise<Raffle> {
 }
 
 export async function getRaffleById(id: string): Promise<Raffle | null> {
-  return getRaffle<Raffle>(id);
+  const r = await getRaffle<Raffle>(id);
+  if (r && !r.prizes && (r as any).prize) {
+    r.prizes = [(r as any).prize];
+  }
+  return r;
 }
 
 export async function updateRaffle(
@@ -45,7 +56,7 @@ export async function updateRaffle(
   const updated: Raffle = {
     ...raffle,
     ...(input.title !== undefined && { title: input.title }),
-    ...(input.prize !== undefined && { prize: input.prize }),
+    ...(input.prizes !== undefined && { prizes: input.prizes }),
     ...(input.totalNumbers !== undefined && { totalNumbers: input.totalNumbers }),
     ...(input.numbersPerRow !== undefined && { numbersPerRow: input.numbersPerRow }),
   };

@@ -76,23 +76,30 @@ export default function RaffleDetail() {
   if (!raffle) return null;
 
   const soldNumbers = raffle.participants.flatMap((p) => p.numbers);
+  const prizes = raffle.prizes || [(raffle as any).prize].filter(Boolean);
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
+    <div className="mx-auto max-w-5xl px-3 py-6 sm:px-4 sm:py-8">
       <div className="mb-4 flex items-center justify-between">
-        <div>
+        <div className="min-w-0 flex-1">
           <Link
             href="/"
             className="text-sm text-blue-600 hover:underline"
           >
             &larr; Volver
           </Link>
-          <h1 className="mt-1 text-2xl font-bold">{raffle.title}</h1>
-          <p className="text-sm text-gray-500">Premio: {raffle.prize}</p>
+          <h1 className="mt-1 truncate text-xl font-bold sm:text-2xl">{raffle.title}</h1>
+          <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-sm text-gray-500">
+            {prizes.map((p: string, i: number) => (
+              <span key={i}>
+                <span className="font-medium">{i + 1}°</span> {p}
+              </span>
+            ))}
+          </div>
         </div>
         <button
           onClick={handleDelete}
-          className="rounded-lg bg-red-100 px-3 py-1.5 text-xs text-red-600 hover:bg-red-200"
+          className="shrink-0 rounded-lg bg-red-100 px-3 py-1.5 text-xs text-red-600 hover:bg-red-200"
         >
           Eliminar
         </button>
@@ -104,20 +111,20 @@ export default function RaffleDetail() {
         </p>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
-        <div>
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
+        <div className="min-w-0 flex-1 overflow-x-auto">
           <ImageExport title={raffle.title}>
             <NumberGrid
               totalNumbers={raffle.totalNumbers}
               numbersPerRow={raffle.numbersPerRow}
               participants={raffle.participants}
               title={raffle.title}
-              prize={raffle.prize}
+              prizes={prizes}
             />
           </ImageExport>
         </div>
 
-        <div className="space-y-4">
+        <div className="w-full shrink-0 space-y-4 lg:w-72">
           <ParticipantForm
             raffleId={id}
             totalNumbers={raffle.totalNumbers}
@@ -129,7 +136,9 @@ export default function RaffleDetail() {
             <h3 className="mb-2 text-sm font-semibold">
               Participantes ({raffle.participants.length})
             </h3>
-            <ParticipantList participants={raffle.participants} />
+            <div className="max-h-80 overflow-y-auto">
+              <ParticipantList participants={raffle.participants} />
+            </div>
           </div>
         </div>
       </div>

@@ -66,7 +66,7 @@ npm run lint     # ESLint
 ## Data model
 
 ```typescript
-Raffle { id, title, prize, totalNumbers, numbersPerRow, createdAt, participants[] }
+Raffle { id, title, prizes: string[], totalNumbers, numbersPerRow, createdAt, participants[] }
 Participant { id, name, numbers[], createdAt }
 ```
 
@@ -75,7 +75,8 @@ Participant { id, name, numbers[], createdAt }
 - **Grid configurable**: `totalNumbers` + `numbersPerRow` define the shape (10×10, 8×8, 5×20, etc.)
 - **Validation**: Numbers must be 1..totalNumbers, not already sold, not duplicated within the same purchase.
 - **Delete raffle**: Button in detail page, prompts confirmation, redirects to `/`.
-- **PNG export**: Button below grid, captures the entire grid including title and prize.
+- **PNG export**: Button below grid, captures the entire grid including gradient banner with title and prizes.
+- **Migration**: Existing raffles with `prize` (string) are migrated to `prizes` (string[]) on read in store.ts.
 
 ## Gotchas
 
