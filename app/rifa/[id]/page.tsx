@@ -157,15 +157,8 @@ export default function RaffleDetail() {
           </div>
 
           <ImageExport
+            raffleId={raffle.id}
             title={raffle.title}
-            prizes={prizes}
-            totalNumbers={raffle.totalNumbers}
-            numbersPerRow={raffle.numbersPerRow}
-            participants={raffle.participants}
-            prices={raffle.prices || []}
-            paymentAlias={raffle.paymentAlias || ""}
-            disclaimer={raffle.disclaimer || ""}
-            soldEmoji={raffle.soldEmoji}
           />
 
           <ParticipantForm
