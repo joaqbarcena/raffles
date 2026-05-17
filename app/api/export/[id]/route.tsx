@@ -12,11 +12,15 @@ export async function GET(
   const raffle = await getRaffleById(id);
   if (!raffle) return new Response("Rifa no encontrada", { status: 404 });
 
-  const fonts = (await Promise.all([
+  const fontResults = await Promise.allSettled([
     loadGoogleFont("Luckiest Guy", 400),
     loadGoogleFont("Playfair Display", 400),
     loadGoogleFont("Playfair Display", 700),
-  ])) as any;
+    loadGoogleFont("Noto Emoji", 400),
+  ]);
+  const fonts = fontResults
+    .filter((r) => r.status === "fulfilled")
+    .map((r) => (r as PromiseFulfilledResult<any>).value);
 
   const sold = new Set(raffle.participants.flatMap((p) => p.numbers));
   const nums = Array.from({ length: raffle.totalNumbers }, (_, i) => i + 1);
@@ -91,8 +95,7 @@ export async function GET(
           <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 16, marginBottom: 26 }}>
             {prizes.map((p: string, i: number) => (
               <div key={i} style={{ display: "flex", alignItems: "center", backgroundColor: "rgba(255,255,255,0.9)", borderRadius: 20, padding: "18px 24px", fontSize: 24, fontWeight: 700, color: "#222", fontFamily: "Playfair Display" }}>
-                <span>{i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `#${i + 1}`}</span>
-                <span>&nbsp;{i + 1}° Premio — {p}</span>
+                <span>{i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `#${i + 1}`} {p}</span>
               </div>
             ))}
           </div>
@@ -103,7 +106,7 @@ export async function GET(
                 {nums.slice(rowIdx * gridCols, (rowIdx + 1) * gridCols).map((num) => (
                   <div key={num} style={{ width: cellSize, height: cellSize, flexShrink: 0, backgroundColor: sold.has(num) ? "rgba(220,252,231,0.7)" : "white", borderRadius: 16, display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: gridCols > 8 ? 16 : 24, color: sold.has(num) ? "#166534" : "#333", border: sold.has(num) ? "2px solid #22c55e" : "2px solid rgba(0,0,0,0.05)" }}>
                     {sold.has(num) ? (
-                      <span style={{ fontSize: gridCols > 8 ? 22 : 32 }}>{emoji}</span>
+                      <span style={{ fontFamily: "Noto Emoji", fontSize: gridCols > 8 ? 22 : 32 }}>{emoji}</span>
                     ) : (
                       num
                     )}
