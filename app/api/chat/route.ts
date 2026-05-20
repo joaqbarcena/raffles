@@ -18,9 +18,10 @@ export async function POST(request: Request) {
 
     const reply = await handleChat(messages);
     return NextResponse.json({ reply });
-  } catch {
+  } catch (err) {
+    console.error("Chat error:", err);
     return NextResponse.json(
-      { error: "Error al procesar el mensaje" },
+      { error: "Error al procesar el mensaje", detail: String(err) },
       { status: 500 }
     );
   }
